@@ -11,6 +11,9 @@
 			},
 			"date": {
 				"type": "string"
+			},
+			"file_name": {
+				"type": "string"
 			}
 		},
 		"folder": {
