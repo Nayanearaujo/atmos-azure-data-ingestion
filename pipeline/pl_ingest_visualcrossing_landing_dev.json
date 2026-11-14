@@ -64,7 +64,8 @@
 							"date": {
 								"value": "@pipeline().parameters.date",
 								"type": "Expression"
-							}
+							},
+							"file_name": "@toLower(concat('atmos_', pipeline().parameters.city, '_', formatDateTime(utcNow(), 'yyyyMMddHHmmss'), '.json'))"
 						}
 					}
 				]
