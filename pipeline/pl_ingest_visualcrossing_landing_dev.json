@@ -48,6 +48,10 @@
 							"date": {
 								"value": "@pipeline().parameters.date",
 								"type": "Expression"
+							},
+							"apiKey": {
+								"value": "E79ZEF9BMCMEMDAPSNAY8DNDM",
+								"type": "Expression"
 							}
 						}
 					}
