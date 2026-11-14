@@ -1,0 +1,15 @@
+{
+	"name": "adf-atmos-dev-westus2-2027",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "westus2",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "10cabd17-1504-4479-8fa5-843338fe5168",
+		"tenantId": "3104cc5f-f458-4dbe-8624-4ca83b75ba0a"
+	}
+}
