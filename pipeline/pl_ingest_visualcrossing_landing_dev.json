@@ -57,7 +57,7 @@
 								"type": "Expression"
 							},
 							"apiKey": {
-								"value": "E79ZEF9BMCMEMDAPSNAY8DNDM",
+								"value": "@activity('web_get_apikey').output.value",
 								"type": "Expression"
 							}
 						}
