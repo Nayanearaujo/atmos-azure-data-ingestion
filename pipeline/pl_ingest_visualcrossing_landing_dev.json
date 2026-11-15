@@ -5,7 +5,14 @@
 			{
 				"name": "copy_visualcrossing_to_landing",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "web_get_apikey",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -88,7 +95,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"method": "GET",
-					"url": "https://kv-atmos-dev-wus2-2027.vault.azure.net/secrets/visual-crossing-api-key?api-version=7.5",
+					"url": "https://kv-atmos-dev-wus2-2027.vault.azure.net/secrets/visualcrossing-api-key-dev?api-version=7.5",
 					"authentication": {
 						"type": "MSI",
 						"resource": "https://vault.azure.net"
