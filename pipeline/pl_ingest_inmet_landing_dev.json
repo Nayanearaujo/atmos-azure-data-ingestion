@@ -86,7 +86,26 @@
 										"type": "Expression"
 									}
 								},
-								"enableStaging": false
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
 							},
 							"inputs": [
 								{
@@ -95,6 +114,19 @@
 									"parameters": {
 										"id_estacao": "@pipeline().parameters.id_estacao",
 										"ano": "@item()"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_csv_inmet_landing_dev",
+									"type": "DatasetReference",
+									"parameters": {
+										"ano": {
+											"value": "@string(item())",
+											"type": "Expression"
+										},
+										"file_name": "@toLower(     concat(         'atmos_',         pipeline().parameters.id_estacao,         '_',         string(item()),         '_',         formatDateTime(utcNow(), 'yyyyMMddHHmmss'),         '.csv'     ) )"
 									}
 								}
 							]
