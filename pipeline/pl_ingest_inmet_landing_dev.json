@@ -46,6 +46,26 @@
 						"type": "Expression"
 					}
 				}
+			},
+			{
+				"name": "foreach_ano",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "set_year_list",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('year_list')",
+						"type": "Expression"
+					},
+					"batchCount": 5
+				}
 			}
 		],
 		"parameters": {
