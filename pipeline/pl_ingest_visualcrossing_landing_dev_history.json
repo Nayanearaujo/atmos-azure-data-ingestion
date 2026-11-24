@@ -1,0 +1,247 @@
+{
+	"name": "pl_ingest_visualcrossing_landing_dev_history",
+	"properties": {
+		"activities": [
+			{
+				"name": "copy_visualcrossing_to_landing",
+				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_http_visualcrossing_src_dev",
+						"type": "DatasetReference",
+						"parameters": {
+							"city": {
+								"value": "@pipeline().parameters.city",
+								"type": "Expression"
+							},
+							"date": {
+								"value": "@variables('date')",
+								"type": "Expression"
+							},
+							"apiKey": {
+								"value": "@activity('web_get_apikey').output.value",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_json_visualcrossing_landing_dev",
+						"type": "DatasetReference",
+						"parameters": {
+							"city": {
+								"value": "@pipeline().parameters.city",
+								"type": "Expression"
+							},
+							"date": {
+								"value": "@variables('date')",
+								"type": "Expression"
+							},
+							"file_name": "@toLower(concat('atmos_', pipeline().parameters.city, '_', formatDateTime(utcNow(), 'yyyyMMddHHmmss'), '.json'))"
+						}
+					}
+				]
+			},
+			{
+				"name": "web_get_apikey",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": "https://kv-atmos-dev-wus2-2027.vault.azure.net/secrets/visualcrossing-api-key-dev?api-version=7.5",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "set_date_list",
+				"description": "",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "web_get_apikey",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "date_list",
+					"value": {
+						"value": "@range(0, add(div(sub(ticks(pipeline().parameters.endDate), ticks(pipeline().parameters.startDate)), 864000000000), 1))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "foreach_date",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "set_date_list",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('date_list')",
+						"type": "Expression"
+					},
+					"batchCount": 10,
+					"activities": [
+						{
+							"name": "copy_visualcrossing_to_landing_copy3",
+							"description": "",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "JsonSource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "GET"
+									},
+									"formatSettings": {
+										"type": "JsonReadSettings"
+									}
+								},
+								"sink": {
+									"type": "JsonSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "JsonWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_http_visualcrossing_src_dev",
+									"type": "DatasetReference",
+									"parameters": {
+										"city": {
+											"value": "@pipeline().parameters.city",
+											"type": "Expression"
+										},
+										"date": {
+											"value": "@formatDateTime(addDays(pipeline().parameters.startDate, item()), 'yyyy-MM-dd')",
+											"type": "Expression"
+										},
+										"apiKey": {
+											"value": "@activity('web_get_apikey').output.value",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_json_visualcrossing_landing_dev",
+									"type": "DatasetReference",
+									"parameters": {
+										"city": {
+											"value": "@pipeline().parameters.city",
+											"type": "Expression"
+										},
+										"date": {
+											"value": "@formatDateTime(addDays(pipeline().parameters.startDate, item()), 'yyyy-MM-dd')",
+											"type": "Expression"
+										},
+										"file_name": "@toLower(concat('atmos_', pipeline().parameters.city, '_', formatDateTime(utcNow(), 'yyyyMMddHHmmss'), '.json'))"
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"city": {
+				"type": "string",
+				"defaultValue": "brasilia"
+			},
+			"startDate": {
+				"type": "string"
+			},
+			"endDate": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"date": {
+				"type": "String",
+				"defaultValue": "@utcnow('yyyy-MM-dd')"
+			},
+			"date_list": {
+				"type": "Array"
+			}
+		},
+		"folder": {
+			"name": "VisualCrossing"
+		},
+		"annotations": []
+	}
+}

@@ -1,0 +1,41 @@
+{
+	"name": "ds_csv_inmet_landing_dev",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adlsg2_atmos_dev",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"ano": {
+				"type": "string"
+			},
+			"file_name": {
+				"type": "string"
+			},
+			"id_estacao": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "INMET"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "@dataset().file_name",
+				"folderPath": {
+					"value": "@toLower(concat('landing/inmet/microdados/', dataset().id_estacao, '/ano=', dataset().ano))",
+					"type": "Expression"
+				},
+				"fileSystem": "atmos-landing-dev-001"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
