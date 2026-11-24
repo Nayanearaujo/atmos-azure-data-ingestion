@@ -26,7 +26,7 @@
 				"type": "AzureBlobFSLocation",
 				"fileName": "@dataset().file_name",
 				"folderPath": {
-					"value": "@toLower(concat('landing/inmet/id_estacao=', dataset().id_estacao, '/ano=', dataset().ano))",
+					"value": "@toLower(concat('landing/inmet/microdados/', dataset().id_estacao, '/ano=', dataset().ano))",
 					"type": "Expression"
 				},
 				"fileSystem": "atmos-landing-dev-001"
