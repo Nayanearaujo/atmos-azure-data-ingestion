@@ -10,7 +10,7 @@
 					"timeout": "0.12:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
+					"secureOutput": true,
 					"secureInput": false
 				},
 				"userProperties": [],
@@ -26,7 +26,14 @@
 			{
 				"name": "set_year_list",
 				"type": "SetVariable",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "web_get_apikey",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"secureOutput": false,
 					"secureInput": false
@@ -34,11 +41,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "year_list",
-					"value": [
-						"@range(pipeline().parameters.start_year",
-						" add(sub(pipeline().parameters.end_year",
-						" pipeline().parameters.start_year), 1))"
-					]
+					"value": {
+						"value": "@range(pipeline().parameters.start_year, add(sub(pipeline().parameters.end_year, pipeline().parameters.start_year), 1))",
+						"type": "Expression"
+					}
 				}
 			}
 		],
