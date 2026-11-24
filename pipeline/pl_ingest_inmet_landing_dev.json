@@ -1,0 +1,63 @@
+{
+	"name": "pl_ingest_inmet_landing_dev",
+	"properties": {
+		"activities": [
+			{
+				"name": "web_get_apikey",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": "https://kv-atmos-dev-wus2-2027.vault.azure.net/secrets/visualcrossing-api-key-dev?api-version=7.5",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "set_year_list",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "year_list",
+					"value": [
+						"@range(pipeline().parameters.start_year",
+						" add(sub(pipeline().parameters.end_year",
+						" pipeline().parameters.start_year), 1))"
+					]
+				}
+			}
+		],
+		"parameters": {
+			"id_estacao": {
+				"type": "string"
+			},
+			"start_year": {
+				"type": "int"
+			},
+			"end_year": {
+				"type": "int"
+			}
+		},
+		"variables": {
+			"year_list": {
+				"type": "Array"
+			}
+		},
+		"annotations": []
+	}
+}
